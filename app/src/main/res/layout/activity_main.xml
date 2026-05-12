@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F7FA"
+    android:fillViewport="true">
+
+    <!-- 原来的 RelativeLayout 现在作为 ScrollView 的子元素 -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+
+    <!-- 顶部卡片：总金额统计 -->
+    <LinearLayout
+        android:id="@+id/top_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/card_background"
+        android:padding="24dp"
+        android:elevation="4dp">
+
+        <!-- 总金额 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="总流水"
+                android:textColor="#666666"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_total_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="¥ 0.00"
+                android:textColor="#2196F3"
+                android:textSize="42sp"
+                android:textStyle="bold" />
+
+            <!-- 支出和收入统计 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <!-- 支出 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="支出"
+                        android:textColor="#666666"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/tv_expense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="¥ 0.00"
+                        android:textColor="#F44336"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- 分隔线 -->
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="40dp"
+                    android:background="#E0E0E0"
+                    android:layout_marginHorizontal="16dp" />
+
+                <!-- 收入 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="收入"
+                        android:textColor="#666666"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/tv_income"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="¥ 0.00"
+                        android:textColor="#4CAF50"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_month_summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="本月已消费 0 笔"
+                android:textColor="#999999"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp" />
+
+
+        <!-- 系统功能演示区域（合并为一个紧凑区域） -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:id="@+id/btn_add_expense"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/btn_add_expense"
+                android:drawableStart="@android:drawable/ic_menu_add"
+                android:drawablePadding="10dp"
+                android:elevation="2dp"
+                android:stateListAnimator="@null"
+                android:text="记一笔"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="📱 系统功能演示"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <!-- 第一行：通知和广播 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <!-- 通知按钮 -->
+                <Button
+                    android:id="@+id/btn_send_reminder"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/btn_add_expense"
+                android:text="通知"
+                android:textSize="12sp"
+                android:textColor="#FFFFFF"
+                android:minHeight="48dp" />  <!-- 添加minHeight -->
+
+                <!-- 广播按钮 -->
+                <Button
+                    android:id="@+id/btn_send_broadcast"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:background="@drawable/btn_add_expense"
+                    android:text="广播"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:minHeight="48dp" />  <!-- 添加minHeight -->
+            </LinearLayout>
+
+            <!-- 第二行：服务控制 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <!-- 启动后台任务 -->
+                <Button
+                    android:id="@+id/btn_start_service"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/btn_add_expense"
+                    android:text="启动后台任务"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:minHeight="48dp" />
+
+                <!-- 停止后台任务 -->
+                <Button
+                    android:id="@+id/btn_stop_service"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:background="@drawable/btn_add_expense"
+                    android:text="停止后台任务"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:minHeight="48dp" />
+            </LinearLayout>
+
+            <!-- 第三行：Provider测试 -->
+            <Button
+                android:id="@+id/btn_test_provider"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/btn_add_expense"
+                android:text="测试ContentProvider"
+                android:textSize="12sp"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="8dp"
+                android:minHeight="48dp" />
+
+            <!-- 状态显示区域（紧凑） -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#F8F9FA"
+                android:padding="8dp"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/tv_notification_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="通知: 就绪"
+                    android:textSize="10sp"
+                    android:textColor="#666666"
+                    android:layout_marginBottom="2dp" />
+
+                <TextView
+                    android:id="@+id/tv_broadcast_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="广播: 等待"
+                    android:textSize="10sp"
+                    android:textColor="#666666"
+                    android:layout_marginBottom="2dp" />
+
+                <TextView
+                    android:id="@+id/tv_service_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="后台任务: 已停止"
+                    android:textSize="10sp"
+                    android:textColor="#666666" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <!-- 记一笔按钮 -->
+    </LinearLayout>
+
+    <!-- 列表标题 -->
+    <LinearLayout
+        android:id="@+id/list_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/top_card"
+        android:orientation="horizontal"
+        android:paddingTop="24dp"
+        android:paddingBottom="12dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="交易记录"
+            android:textSize="18sp"
+            android:textColor="#333333"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_record_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="共 0 条"
+            android:textSize="14sp"
+            android:textColor="#666666" />
+    </LinearLayout>
+
+    <!-- 交易记录列表 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_below="@id/list_header"
+        android:padding="8dp"
+        android:scrollbars="vertical"
+        android:visibility="gone" />
+
+    <!-- 空列表提示 -->
+    <LinearLayout
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/list_header"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📋"
+            android:textSize="64sp"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="暂无交易记录"
+            android:textSize="20sp"
+            android:textColor="#666666"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="点击上方按钮添加第一条记录"
+            android:textSize="14sp"
+            android:textColor="#999999"
+            android:gravity="center" />
+    </LinearLayout>
+
+    </RelativeLayout>
+</ScrollView>
