@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -63,8 +64,10 @@ public class ExpenseMonitorService extends Service {
         // 初始化Handler
         handler = new Handler();
 
-        // 创建通知渠道
-        createNotificationChannel();
+        // 创建通知渠道（如果Android 8.0+）
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel();
+        }
     }
 
     @Override

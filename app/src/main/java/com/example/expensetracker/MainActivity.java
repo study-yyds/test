@@ -45,15 +45,12 @@ public class MainActivity extends AppCompatActivity {
     private Button btnStopService;
     private Button btnTestProvider;
     private TextView tvServiceStatus;
-    private Button btnSendReminder;
     private NotificationHelper notificationHelper;
 
     private TextView tvNotificationStatus;
     private static final int PERMISSION_REQUEST_CODE = 100;
 
     // 服务相关
-    private ExpenseMonitorService expenseMonitorService;
-    private boolean isServiceBound = false;
     private ServiceStatusReceiver serviceStatusReceiver;
     private RecyclerView recyclerView;
     private View emptyView;
@@ -108,12 +105,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateLifecycleLog("3. onResume() - Activity获得焦点，可以与用户交互");
+
+        // 自动发送记账提醒通知（检查当天是否有记账记录）
+        autoSendReminderIfNeeded();
+
+        Log.d(TAG, "onResume()执行完成，Activity已准备好与用户交互");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         updateLifecycleLog("4. onPause() - Activity即将失去焦点");
+
+        // 在Activity失去焦点时可以清理资源或保存状态
+        Log.d(TAG, "onPause()执行完成，Activity即将进入后台");
     }
 
     @Override
@@ -154,6 +159,56 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Log.d(TAG, "onDestroy()执行完成，Activity已被销毁");
+    }
+
+    /**
+     * 自动发送记账提醒（如果当天还没有记账记录）
+     * 不需要用户点击按钮，在onResume()中自动调用
+     */
+    private void autoSendReminderIfNeeded() {
+        try {
+            // 1. 检查当天是否有记账记录
+            int todayCount = getTodayRecordCount();
+
+            // 2. 如果当天还没有记录，发送提醒
+            if (todayCount == 0) {
+                Log.d(TAG, "当天无记账记录，自动发送提醒通知");
+
+                // 发送记账提醒通知
+                if (notificationHelper != null) {
+                    notificationHelper.sendExpenseReminderNotification();
+
+                    // 更新状态显示
+                    String time = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+                    tvNotificationStatus.setText("已自动发送记账提醒 at " + time);
+                }
+            } else {
+                Log.d(TAG, "当天已有" + todayCount + "条记录，无需提醒");
+                tvNotificationStatus.setText("今日已记账 " + todayCount + " 条 ✓");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "自动发送提醒失败", e);
+        }
+    }
+
+
+    /**
+     * 获取当天记账记录数量
+     */
+    private int getTodayRecordCount() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String today = sdf.format(new Date());
+
+        String query = "SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_RECORDS + " WHERE date LIKE '" + today + "%'";
+        Cursor cursor = databaseHelper.getReadableDatabase().rawQuery(query, null);
+
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+
+        return count;
     }
 
     /**
@@ -200,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
         btnTestProvider = findViewById(R.id.btn_test_provider);
 
 
-        btnSendReminder = findViewById(R.id.btn_send_reminder);
+
         tvNotificationStatus = findViewById(R.id.tv_notification_status);
 
         btnSendBroadcast = findViewById(R.id.btn_send_broadcast);
@@ -231,20 +286,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // 新增：发送记账提醒通知按钮监听器
-        btnSendReminder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 先检查权限状态
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                        // 显示简单的提示
-                        Toast.makeText(MainActivity.this,
-                                "正在请求通知权限...", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                sendExpenseReminder();
-            }
-        });
+
 
         // 添加：发送广播按钮监听器
         btnSendBroadcast.setOnClickListener(new View.OnClickListener() {
