@@ -77,21 +77,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "1. onCreate() - Activity正在被创建");
+
         setContentView(R.layout.activity_main);
 
         // 初始化数据库帮助类
         databaseHelper = new DatabaseHelper(this);
-
         notificationHelper = new NotificationHelper(this);
 
         initBroadcastReceiver();
-
         initViews();
         setupListeners();
         setupServiceReceiver();
+
         // 检查Intent中是否包含显示添加对话框的标志
         checkAndUpdateNotificationPermissionStatus();
         loadAndDisplayRecords();
+
+        // 启动后台服务 - 在Activity创建时自动启动
+        startExpenseMonitorService();
 
         Log.d(TAG, "onCreate()执行完成，Activity已创建但不可见");
     }
@@ -117,6 +120,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         updateLifecycleLog("5. onStop() - Activity即将变得不可见");
+
+        // 停止后台服务 - 在Activity进入后台时自动停止
+        stopExpenseMonitorService();
+
+        Log.d(TAG, "onStop()执行完成，Activity已不可见");
     }
 
     @Override
@@ -129,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-
         // 关闭数据库连接
         if (databaseHelper != null) {
             databaseHelper.close();
@@ -141,11 +148,12 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "广播接收器已注销");
         }
 
-        // 注销广播接收器
+        // 注销服务状态广播接收器
         if (serviceStatusReceiver != null) {
             unregisterReceiver(serviceStatusReceiver);
         }
 
+        Log.d(TAG, "onDestroy()执行完成，Activity已被销毁");
     }
 
     /**
@@ -188,10 +196,6 @@ public class MainActivity extends AppCompatActivity {
         transactionAdapter = new TransactionAdapter();
         recyclerView.setAdapter(transactionAdapter);
 
-        // 新增：服务相关UI初始化
-        btnStartService = findViewById(R.id.btn_start_service);
-        btnStopService = findViewById(R.id.btn_stop_service);
-        tvServiceStatus = findViewById(R.id.tv_service_status);
 
         btnTestProvider = findViewById(R.id.btn_test_provider);
 
@@ -213,20 +217,9 @@ public class MainActivity extends AppCompatActivity {
                 showAddExpenseDialog();
             }
         });
-        // 新增：服务控制按钮监听器
-        btnStartService.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startExpenseMonitorService();
-            }
-        });
+        // 新增：服务控制按钮监
 
-        btnStopService.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stopExpenseMonitorService();
-            }
-        });
+
 
         // 测试Provider按钮
         btnTestProvider.setOnClickListener(new View.OnClickListener() {
