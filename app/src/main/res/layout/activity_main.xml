@@ -169,19 +169,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="8dp">
-
-                <!-- 广播按钮 -->
-                <Button
-                    android:id="@+id/btn_send_broadcast"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="4dp"
-                    android:background="@drawable/btn_add_expense"
-                    android:text="广播"
-                    android:textSize="12sp"
-                    android:textColor="#FFFFFF"
-                    android:minHeight="48dp" />  <!-- 添加minHeight -->
             </LinearLayout>
             <!-- 第三行：Provider测试 -->
             <Button

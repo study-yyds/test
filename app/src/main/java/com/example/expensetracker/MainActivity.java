@@ -23,6 +23,8 @@ import android.net.Uri;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private View emptyView;
 
     private AlertDialog addExpenseDialog;
-    private Button btnSendBroadcast;
+
     private TextView tvBroadcastStatus;
 
     // 广播接收器
@@ -69,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
     private TransactionAdapter transactionAdapter;
 
 
+    private int transactionCount = 0;
+    private double totalExpense = 0.0;
+    private double totalIncome = 0.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +97,11 @@ public class MainActivity extends AppCompatActivity {
 
         // 启动后台服务 - 在Activity创建时自动启动
         startExpenseMonitorService();
+        // 注册广播接收器
+        registerBroadcastReceiver();
+
+        // 应用启动时自动发送广播
+        sendStartupBroadcast();
 
         Log.d(TAG, "onCreate()执行完成，Activity已创建但不可见");
     }
@@ -258,12 +268,95 @@ public class MainActivity extends AppCompatActivity {
 
         tvNotificationStatus = findViewById(R.id.tv_notification_status);
 
-        btnSendBroadcast = findViewById(R.id.btn_send_broadcast);
         tvBroadcastStatus = findViewById(R.id.tv_broadcast_status);
 
 
 
     }
+
+    /**
+     * 注册广播接收器
+     */
+    private void registerBroadcastReceiver() {
+        broadcastReceiver = new ExpenseBroadcastReceiver();
+
+        // 创建IntentFilter并注册要监听的广播
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BroadcastConstants.ACTION_TRANSACTION_ADDED);
+        filter.addAction(BroadcastConstants.ACTION_DATA_UPDATED);
+        filter.addAction(BroadcastConstants.ACTION_BROADCAST_TEST);
+
+        // 注册广播接收器（动态注册）
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(broadcastReceiver, filter);
+
+        updateBroadcastStatus("广播接收器已注册");
+    }
+
+    /**
+     * 应用启动时发送广播
+     * 通知其他组件应用已启动
+     */
+    private void sendStartupBroadcast() {
+        Intent intent = new Intent(BroadcastConstants.ACTION_BROADCAST_TEST);
+        intent.putExtra(BroadcastConstants.EXTRA_MESSAGE, "应用启动完成，广播系统已就绪");
+
+        // 发送本地广播
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+        updateBroadcastStatus("已发送启动广播");
+
+        // 同时发送数据更新广播（初始状态）
+        sendDataUpdatedBroadcast();
+    }
+
+    /**
+     * 账目更新时发送广播
+     * 在添加、修改或删除账目时调用此方法
+     */
+    public void onTransactionUpdated(String category, double amount, String time) {
+        // 更新统计数据
+        transactionCount++;
+        if (amount < 0) {
+            totalExpense += Math.abs(amount);
+        } else {
+            totalIncome += amount;
+        }
+
+        // 发送交易添加广播
+        sendTransactionAddedBroadcast(category, amount, time);
+
+        // 发送数据更新广播
+        sendDataUpdatedBroadcast();
+
+        updateBroadcastStatus("账目已更新，共" + transactionCount + "笔交易");
+    }
+    /**
+     * 发送交易添加广播
+     */
+    private void sendTransactionAddedBroadcast(String category, double amount, String time) {
+        Intent intent = new Intent(BroadcastConstants.ACTION_TRANSACTION_ADDED);
+        intent.putExtra("category", category);
+        intent.putExtra("amount", amount);
+        intent.putExtra("time", time != null ? time : String.valueOf(System.currentTimeMillis()));
+
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    /**
+     * 发送数据更新广播
+     */
+    private void sendDataUpdatedBroadcast() {
+        Intent intent = new Intent(BroadcastConstants.ACTION_DATA_UPDATED);
+        intent.putExtra(BroadcastConstants.EXTRA_TRANSACTION_COUNT, transactionCount);
+        intent.putExtra(BroadcastConstants.EXTRA_TOTAL_EXPENSE, totalExpense);
+        intent.putExtra(BroadcastConstants.EXTRA_TOTAL_INCOME, totalIncome);
+        intent.putExtra(BroadcastConstants.EXTRA_NET_AMOUNT, totalIncome - totalExpense);
+        intent.putExtra(BroadcastConstants.EXTRA_MESSAGE, "账目数据已自动更新");
+
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
 
     private void setupListeners() {
         btnAddExpense.setOnClickListener(new View.OnClickListener() {
@@ -285,16 +378,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        // 新增：发送记账提醒通知按钮监听器
 
-
-        // 添加：发送广播按钮监听器
-        btnSendBroadcast.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendTransactionUpdateBroadcast();
-            }
-        });
     }
 
     /**
